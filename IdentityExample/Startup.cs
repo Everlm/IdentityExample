@@ -37,6 +37,7 @@ namespace IdentityExample
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
             //services.AddControllersWithViews();
 
+            //Modificamos el servicio de identity para la personalizacion 
             services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultUI()
