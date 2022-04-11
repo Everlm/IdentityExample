@@ -47,7 +47,7 @@ namespace IdentityExample.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            //Agregamos input
+            //Add
             [Required]
             [Display(Name = "First Name")]
             public string FirstName { get; set; }

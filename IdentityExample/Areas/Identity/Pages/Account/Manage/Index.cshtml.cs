@@ -30,11 +30,15 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
         [TempData]
         public string StatusMessage { get; set; }
 
+        [TempData]
+        public string UserNameChangeLimitMessage { get; set; }
+
         [BindProperty]
         public InputModel Input { get; set; }
 
         public class InputModel
         {
+            //Add
             [Display(Name = "First Name")]
             public string FirstName { get; set; }
             [Display(Name = "Last Name")]
@@ -61,6 +65,7 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                //Add
                 PhoneNumber = phoneNumber,
                 Username = userName,
                 FirstName = firstName,
@@ -77,7 +82,8 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
+            //Add
+            UserNameChangeLimitMessage = $"You can change your username {user.UsernameChangeLimit} more time(s).";
             await LoadAsync(user);
             return Page();
         }
@@ -106,7 +112,7 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
-
+            //Add
             var firstName = user.FirstName;
             var lastName = user.LastName;
             if (Input.FirstName != firstName)
@@ -120,6 +126,30 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
                 await _userManager.UpdateAsync(user);
             }
 
+            if (user.UsernameChangeLimit > 0)
+            {
+                if (Input.Username != user.UserName)
+                {
+                    var userNameExists = await _userManager.FindByNameAsync(Input.Username);
+                    if (userNameExists != null)
+                    {
+                        StatusMessage = "User name already taken. Select a different username.";
+                        return RedirectToPage();
+                    }
+                    var setUserName = await _userManager.SetUserNameAsync(user, Input.Username);
+                    if (!setUserName.Succeeded)
+                    {
+                        StatusMessage = "Unexpected error when trying to set user name.";
+                        return RedirectToPage();
+                    }
+                    else
+                    {
+                        user.UsernameChangeLimit -= 1;
+                        await _userManager.UpdateAsync(user);
+                    }
+                }
+            }
+
             if (Request.Form.Files.Count > 0)
             {
                 IFormFile file = Request.Form.Files.FirstOrDefault();
@@ -130,7 +160,7 @@ namespace IdentityExample.Areas.Identity.Pages.Account.Manage
                 }
                 await _userManager.UpdateAsync(user);
             }
-
+            //
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
