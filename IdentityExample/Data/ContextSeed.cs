@@ -12,7 +12,20 @@ namespace IdentityExample.Data
 {
     public class ContextSeed
     {
-        public static async Task SeedRolesAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedSuperAdminAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            //Seed Default User
+            var defaultUser = new ApplicationUser
+            {
+                UserName = "superadmin",
+                Email = "superadmin@gmail.com",
+                FirstName = "Ever",
+                LastName = "Lambrano",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true
+            };
+        }
+            public static async Task SeedRolesAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             //Seed Roles
             await roleManager.CreateAsync(new IdentityRole(Enums.Roles.SuperAdmin.ToString()));
